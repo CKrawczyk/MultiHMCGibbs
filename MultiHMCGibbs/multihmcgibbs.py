@@ -1,19 +1,20 @@
 import copy
 
-from collections import namedtuple
+from collections import namedtuple, Counter
 from functools import partial
 
 from jax import device_put, jacfwd, random, value_and_grad, numpy as jnp, vmap
 from numpyro.handlers import condition, seed, substitute, trace
-from numpyro.infer.initialization import init_to_sample
+from numpyro.infer.initialization import init_to_sample, init_to_uniform
 from numpyro.infer.mcmc import MCMCKernel
 from numpyro.util import is_prng_key
 
 MultiHMCGibbsState = namedtuple("MultiHMCGibbsState", "z, hmc_states, diverging, rng_key")
 """
  - **z** - a dict of the current latent values (all sites)
- - **hmc_states** - list of current :data:`~numpyro.infer.hmc.HMCState`
+ - **hmc_states** - list of current :data:`~numpyro.infer.hmc.HMCState` (one per gibbs step)
  - **diverging** - A list of boolean value to indicate whether the current trajectory is diverging.
+ - **rng_key** - random number generator seed used for the iteration.
 """
 
 
@@ -31,19 +32,20 @@ class MultiHMCGibbs(MCMCKernel):
         Parameters
         ----------
         inner_kernels: List of HMC/NUTS kernels for each of the lists in `gibbs_sites`.  All kernels
-            must use the same `model` but can any of the other parameters be different (e.g.
-            `target_accept_prob`).
+            must use the same `model` but any of the other parameters can be different (e.g. `target_accept_prob`).
         gibbs_sites_list: List of lists of sites names to be gibbs stepped over.  Each inner list
-            is updated as a group, and the groups are updated in order.  All sites for the model
-            must be explicitly listed in one of the groups.
+            is updated as a group, and the groups are updated in order.  All sample sites for the model
+            must be explicitly listed in *only one* of the groups.
         '''
         self.inner_kernels = []
         self.gibbs_sites_list = gibbs_sites_list
         for kdx, kernel in enumerate(inner_kernels):
+            if kernel._model is not inner_kernels[0]._model:
+                raise ValueError(f'inner kernel {kdx} does not have the same Numpyro model as kernel 0.')
             k = copy.copy(kernel)
             k._model = partial(_wrap_model, k.model)
             k._cond_sites = sum(
-                self.gibbs_sites_list[:kdx] + self.gibbs_sites_list[kdx+1:],
+                self.gibbs_sites_list[:kdx] + self.gibbs_sites_list[kdx + 1:],
                 []
             )
             self.inner_kernels.append(k)
@@ -81,8 +83,36 @@ class MultiHMCGibbs(MCMCKernel):
         _ = kwargs.pop("_cond_sites", {})
         return self.inner_kernels[0].postprocess_fn(args, kwargs)
 
+    def check_gibbs_sites(self, model_args, model_kwargs):
+        t = trace(
+            substitute(
+                seed(self.model, random.PRNGKey(0)),  # just need a trace, rng_key does not matter
+                substitute_fn=init_to_uniform
+            )
+        ).get_trace(*model_args, **model_kwargs)
+        all_sites = Counter([
+            key for key, value in t.items()
+            if value['type'] == 'sample' and not value['is_observed']
+        ])
+        listed_sites = Counter(sum(self.gibbs_sites_list, []))
+        if listed_sites != all_sites:
+            message = 'Expected each site to be listed **exactly once**. '
+            duplicate_sites = [k for k, v in listed_sites.items() if v > 1]
+            if len(duplicate_sites) > 0:
+                message += f'Following sites listed more than once: {duplicate_sites}. '
+            missing_sites = list((all_sites - listed_sites).keys())
+            if len(missing_sites) > 0:
+                message += f'Following sites in the model but not listed: {missing_sites}. '
+            # remove duplicate sites before checking for extra site names
+            reduced_listed_sites = Counter(listed_sites.keys())
+            extra_sites = list((reduced_listed_sites - all_sites).keys())
+            if len(extra_sites) > 0:
+                message += f'Following sites listed but not in the model: {extra_sites}.'
+            raise ValueError(message)
+
     def init(self, rng_key, num_warmup, init_params, model_args, model_kwargs):
         model_kwargs = {} if model_kwargs is None else model_kwargs.copy()
+        self.check_gibbs_sites(model_args, model_kwargs)
 
         def init_fn(init_params, key_zs):
             if (init_params is not None) and (len(init_params) == 0):
