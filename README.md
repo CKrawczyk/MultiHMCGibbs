@@ -1,2 +1,3 @@
 # MultiHMCGibbs
-A numpyro Gibbs sampler that uses conditioned HMC kernels for each step.
+
+A Numpyro Gibbs sampler that uses conditioned HMC kernels for each Gibbs step.

@@ -1,0 +1,50 @@
+[build-system]
+requires = ["flit_core >=3.8,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "MultiHMCGibbs"
+authors = [{name = "Coleman Krawczyk"}]
+readme = "README.md"
+license = {file = "LICENSE"}
+classifiers = ["License :: OSI Approved :: Apache Software License"]
+dynamic = ["version", "description"]
+requires-python = ">=3.10"
+dependencies = [
+    "arviz",
+    "corner",
+    "matplotlib",
+    "numpyro"
+]
+
+[project.optional-dependencies]
+test = [
+    "coverage[toml]",
+    "flake8",
+]
+doc = [
+    "myst-nb",
+    "sphinx",
+    "sphinx_rtd_theme"
+]
+dev = [
+    "MultiHMCGibbs[test]",
+    "MultiHMCGibbs[doc]"
+]
+
+[project.urls]
+Source = "https://github.com/CKrawczyk/MultiHMCGibbs"
+
+[tool.flit.sdist]
+exclude = [
+    "docs/",
+    "build_docs.sh"
+]
+
+[tool.coverage.run]
+omit = ["*test*"]
+source = ["MultiHMCGibbs"]
+command_line = "-m unittest discover"
+
+[tool.coverage.report]
+show_missing = true
