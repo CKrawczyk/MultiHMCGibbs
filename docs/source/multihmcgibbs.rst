@@ -6,10 +6,6 @@ MultiHMCGibbs package
    :undoc-members:
    :show-inheritance:
 
-Submodules
-----------
-
-
 .. automodule:: MultiHMCGibbs.multihmcgibbs
    :members:
    :undoc-members:

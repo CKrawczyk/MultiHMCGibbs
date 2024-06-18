@@ -8,15 +8,24 @@ Welcome to MultiHMCGibbs's documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Getting Started:
 
-   example_gibbs
+   README
+
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Examples:
+
+   basic_usage
+   neals_funnel
+
 
 .. toctree::
    :maxdepth: 2
    :caption: API Documentation:
    
-   modules
+   multihmcgibbs
 
 
 Indices and tables

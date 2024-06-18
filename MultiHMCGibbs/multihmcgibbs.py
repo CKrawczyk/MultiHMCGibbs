@@ -25,18 +25,48 @@ def _wrap_model(model, *args, **kwargs):
 
 
 class MultiHMCGibbs(MCMCKernel):
+    '''
+    Multi-HMC-within-Gibbs.  This interface allows the user to combine multiple general purpose gradient-based
+    inference (HMC or NUTS), each conditioned on a different set sub-set of sample sites, as steps in a Gibbs
+    sampler.
+
+    Note that it is the user's responsibility to ensure that every sample site is included in the
+    `gibbs_sites_list` parameter and that each of the `inner_kernels` use the same Numpyro model function.
+
+    Parameters
+    ----------
+    inner_kernels: List of HMC/NUTS kernels for each of the lists in `gibbs_sites`.  All kernels
+        *must use the same `model`* but any of the other parameters can be different
+        (e.g. `target_accept_prob`).
+    gibbs_sites_list: List of lists of sites names that are *free parameters* for each Gibbs step, all other
+        sample sites are fixed to their current values for the step. Each inner list is updated as a group,
+        and the groups are updated in order.  All sample sites for the model must be explicitly listed in
+        *only one* of the groups.
+
+    **Example**
+
+        >>> from jax import random
+        >>> import jax.numpy as jnp
+        >>> import numpyro
+        >>> import numpyro.distributions as dist
+        >>> from numpyro.infer import MCMC, NUTS
+        >>> from MultiHMCGibbs import MultiHMCGibbs
+        ...
+        >>> def model():
+        ...     x = numpyro.sample("x", dist.Normal(0.0, 2.0))
+        ...     y = numpyro.sample("y", dist.Normal(0.0, 2.0))
+        ...     numpyro.sample("obs", dist.Normal(x + y, 1.0), obs=jnp.array([1.0]))
+        ...
+        >>> inner_kernels = [NUTS(model), NUTS(model)]
+        >>> outer_kernel = MultiHMCGibbs(inner_kernels, [['y'], ['x']])
+        >>> mcmc = MCMC(kernel, num_warmup=100, num_samples=100, progress_bar=False)
+        >>> mcmc.run(random.PRNGKey(0))
+        >>> mcmc.print_summary()
+    '''
+
     sample_field = "z"
 
     def __init__(self, inner_kernels, gibbs_sites_list):
-        '''
-        Parameters
-        ----------
-        inner_kernels: List of HMC/NUTS kernels for each of the lists in `gibbs_sites`.  All kernels
-            must use the same `model` but any of the other parameters can be different (e.g. `target_accept_prob`).
-        gibbs_sites_list: List of lists of sites names to be gibbs stepped over.  Each inner list
-            is updated as a group, and the groups are updated in order.  All sample sites for the model
-            must be explicitly listed in *only one* of the groups.
-        '''
         self.inner_kernels = []
         self.gibbs_sites_list = gibbs_sites_list
         for kdx, kernel in enumerate(inner_kernels):
@@ -84,6 +114,8 @@ class MultiHMCGibbs(MCMCKernel):
         return self.inner_kernels[0].postprocess_fn(args, kwargs)
 
     def check_gibbs_sites(self, model_args, model_kwargs):
+        # Check that each sample site is listed exactly once in `gibbs_sites_list`
+        # and provide a useful error message for any duplicate, missing, or extra sites listed.
         t = trace(
             substitute(
                 seed(self.model, random.PRNGKey(0)),  # just need a trace, rng_key does not matter
