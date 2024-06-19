@@ -90,9 +90,9 @@
              
   <section id="an-hmc-within-gibbs-sampler-for-numpyro">
 <h1>An HMC-within-Gibbs sampler for Numpyro<a class="headerlink" href="#an-hmc-within-gibbs-sampler-for-numpyro" title="Link to this heading"></a></h1>
-<p>This package adds a new HMC-within-Gibbs sampler to Numpyro.  Unlike the <code class="docutils literal notranslate"><span class="pre">HMCGibbs</span></code> sampler currently available, this sampler is for situations where you do not have an analytic form for one of your conditioned distributions.  Instead it uses a HMC/NUTS sampler to estimate draws from <em>each</em> of the conditioned distributions.</p>
-<p>To use <code class="docutils literal notranslate"><span class="pre">MultiHMCGibbs</span></code> you need to create a list of HMC or NUTS kernels that wrap the same model, but each can have their own keywords such as <code class="docutils literal notranslate"><span class="pre">target_accept_prob</span></code> or <code class="docutils literal notranslate"><span class="pre">max_tree_depth</span></code>.  The other argument is a list of lists containing the <strong>free</strong> parameters for each of the inner kernels.</p>
-<p>Internally each the sampler will:</p>
+<p>This package adds a new HMC-within-Gibbs sampler to Numpyro.  Unlike the <code class="docutils literal notranslate"><span class="pre">HMCGibbs</span></code> sampler currently available, this sampler is for situations where you do not have an analytic form for one of your conditioned distributions.  Instead, it uses an HMC/NUTS sampler to estimate draws from <em>each</em> of the conditioned distributions.</p>
+<p>To use <code class="docutils literal notranslate"><span class="pre">MultiHMCGibbs</span></code> you need to create a list of HMC or NUTS kernels that wrap the same model, but each can have its own keywords such as <code class="docutils literal notranslate"><span class="pre">target_accept_prob</span></code> or <code class="docutils literal notranslate"><span class="pre">max_tree_depth</span></code>.  The other argument is a list of lists containing the <strong>free</strong> parameters for each of the inner kernels.</p>
+<p>Internally the sampler will:</p>
 <ol class="arabic simple">
 <li><p>Loop over the kernels in the list</p></li>
 <li><p>Conditioned it on the non-free parameters</p></li>
