@@ -11,6 +11,8 @@ Internally each the sampler will:
 4. Step the kernel forward
 5. Move on to the next kernel
 
+Documentation: https://ckrawczyk.github.io/MultiHMCGibbs/
+
 ## Installation
 
 You can install the package with `pip` after cloning the repository.
