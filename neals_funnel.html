@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Neal’s funnel &mdash; MultiHMCGibbs 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=01f34227"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="MultiHMCGibbs package" href="multihmcgibbs.html" />
+    <link rel="prev" title="Basic usage and comparison" href="basic_usage.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            MultiHMCGibbs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="README.html">An HMC-within-Gibbs sampler for Numpyro</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="basic_usage.html">Basic usage and comparison</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Neal’s funnel</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#the-model">The model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#nuts">NUTS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#multihmcgibbs">MultiHMCGibbs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#other-notes">Other notes</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="multihmcgibbs.html">MultiHMCGibbs package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MultiHMCGibbs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Neal’s funnel</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/neals_funnel.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="neal-s-funnel">
+<h1>Neal’s funnel<a class="headerlink" href="#neal-s-funnel" title="Link to this heading"></a></h1>
+<p>Now lets take a distribution where a Gibbs sampler is needed to get a decent result, Neal’s funnel.  In general Gibbs sampler is useful for hierarchical models, with each part of the hierarchy being treated as different steps.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
+<span class="kn">import</span> <span class="nn">numpyro</span>
+<span class="kn">import</span> <span class="nn">numpyro.distributions</span> <span class="k">as</span> <span class="nn">dist</span>
+<span class="kn">import</span> <span class="nn">arviz</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="kn">from</span> <span class="nn">numpyro.infer</span> <span class="kn">import</span> <span class="n">MCMC</span><span class="p">,</span> <span class="n">NUTS</span>
+<span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">random</span>
+
+<span class="kn">from</span> <span class="nn">MultiHMCGibbs</span> <span class="kn">import</span> <span class="n">MultiHMCGibbs</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from .autonotebook import tqdm as notebook_tqdm
+</pre></div>
+</div>
+</div>
+</div>
+<section id="the-model">
+<h2>The model<a class="headerlink" href="#the-model" title="Link to this heading"></a></h2>
+<p>We will set up 5 dimensional funnel, something that regular HMC struggles with.  For this model we know what the true marginal distribution for the <code class="docutils literal notranslate"><span class="pre">y</span></code> variable will be <code class="docutils literal notranslate"><span class="pre">Normal(0,</span> <span class="pre">3)</span></code>, we will use this to see how well each sampler does.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">numpyro</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">dist</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+    <span class="n">numpyro</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">dist</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">dim</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">y</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)))</span>
+
+
+<span class="n">x_marginal_true</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">y_marginal_true</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">dist</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">x_marginal_true</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">run_inference</span><span class="p">(</span><span class="n">kernel</span><span class="p">,</span> <span class="n">chain_method</span><span class="p">,</span> <span class="n">rng_key</span><span class="p">):</span>
+    <span class="n">mcmc</span> <span class="o">=</span> <span class="n">MCMC</span><span class="p">(</span>
+        <span class="n">kernel</span><span class="p">,</span>
+        <span class="n">num_warmup</span><span class="o">=</span><span class="mi">3000</span><span class="p">,</span>
+        <span class="n">num_samples</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span>
+        <span class="n">num_chains</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+        <span class="n">chain_method</span><span class="o">=</span><span class="n">chain_method</span><span class="p">,</span>
+        <span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span>
+    <span class="n">mcmc</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">rng_key</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mcmc</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="nuts">
+<h2>NUTS<a class="headerlink" href="#nuts" title="Link to this heading"></a></h2>
+<p>We will use a large <code class="docutils literal notranslate"><span class="pre">target_accept_prob</span></code> to get rid of most divergent samples and use a large number of warmup and samples to get the <code class="docutils literal notranslate"><span class="pre">r_hat</span></code>s close to <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rng_key</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">hmc_key</span><span class="p">,</span> <span class="n">gibbs_key</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">rng_key</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">funnel_mcmc_hmc</span> <span class="o">=</span> <span class="n">run_inference</span><span class="p">(</span><span class="n">NUTS</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">target_accept_prob</span><span class="o">=</span><span class="mf">0.995</span><span class="p">),</span> <span class="s1">&#39;vectorized&#39;</span><span class="p">,</span> <span class="n">hmc_key</span><span class="p">)</span>
+<span class="n">inf_funnel_hmc</span> <span class="o">=</span> <span class="n">arviz</span><span class="o">.</span><span class="n">from_numpyro</span><span class="p">(</span><span class="n">funnel_mcmc_hmc</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;divergences per chain: </span><span class="si">{</span><span class="n">inf_funnel_hmc</span><span class="o">.</span><span class="n">sample_stats</span><span class="o">.</span><span class="n">diverging</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">arviz</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="n">inf_funnel_hmc</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>divergences per chain: [ 72  24   7 185]
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mean</th>
+      <th>sd</th>
+      <th>hdi_3%</th>
+      <th>hdi_97%</th>
+      <th>mcse_mean</th>
+      <th>mcse_sd</th>
+      <th>ess_bulk</th>
+      <th>ess_tail</th>
+      <th>r_hat</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>x[0]</th>
+      <td>0.004</td>
+      <td>7.151</td>
+      <td>-8.680</td>
+      <td>8.001</td>
+      <td>0.064</td>
+      <td>0.102</td>
+      <td>11381.0</td>
+      <td>1811.0</td>
+      <td>1.01</td>
+    </tr>
+    <tr>
+      <th>x[1]</th>
+      <td>-0.061</td>
+      <td>8.437</td>
+      <td>-8.011</td>
+      <td>9.004</td>
+      <td>0.076</td>
+      <td>0.107</td>
+      <td>14583.0</td>
+      <td>1785.0</td>
+      <td>1.01</td>
+    </tr>
+    <tr>
+      <th>x[2]</th>
+      <td>0.051</td>
+      <td>7.553</td>
+      <td>-7.819</td>
+      <td>9.547</td>
+      <td>0.075</td>
+      <td>0.104</td>
+      <td>12495.0</td>
+      <td>1753.0</td>
+      <td>1.02</td>
+    </tr>
+    <tr>
+      <th>x[3]</th>
+      <td>-0.047</td>
+      <td>7.840</td>
+      <td>-8.481</td>
+      <td>8.486</td>
+      <td>0.083</td>
+      <td>0.093</td>
+      <td>13393.0</td>
+      <td>2163.0</td>
+      <td>1.01</td>
+    </tr>
+    <tr>
+      <th>y</th>
+      <td>0.243</td>
+      <td>2.791</td>
+      <td>-4.883</td>
+      <td>4.681</td>
+      <td>0.256</td>
+      <td>0.182</td>
+      <td>95.0</td>
+      <td>25.0</td>
+      <td>1.03</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>Give the large number of divergent samples in chain 4 let’s remove that from the plots.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x_model_hmc</span> <span class="o">=</span> <span class="n">inf_funnel_hmc</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">chain</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">posterior</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+<span class="n">y_model_hmc</span> <span class="o">=</span> <span class="n">inf_funnel_hmc</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">chain</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">posterior</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">121</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_model_hmc</span><span class="p">,</span> <span class="n">y_model_hmc</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;x[0]&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">122</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">y_model_hmc</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s1">&#39;step&#39;</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;HMC&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_marginal_true</span><span class="p">,</span> <span class="n">y_marginal_true</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;True marginal&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/8b41df9924da27e61e421f241081f0bd8af022e54cc8b6c681e6a12513ed88f8.png" src="_images/8b41df9924da27e61e421f241081f0bd8af022e54cc8b6c681e6a12513ed88f8.png" />
+</div>
+</div>
+<p>We can see that <code class="docutils literal notranslate"><span class="pre">NUTS</span></code> is struggling with this model, the <code class="docutils literal notranslate"><span class="pre">y</span></code> marginal is still missing a bit of negative values at the bottom of the funnel.</p>
+</section>
+<section id="multihmcgibbs">
+<h2>MultiHMCGibbs<a class="headerlink" href="#multihmcgibbs" title="Link to this heading"></a></h2>
+<p>For the <code class="docutils literal notranslate"><span class="pre">MultiHMCGibbs</span></code> sampler we will only put a large <code class="docutils literal notranslate"><span class="pre">target_accept_prob</span></code> on the <code class="docutils literal notranslate"><span class="pre">x</span></code> values (as these are the difficult ones to draw), but keep the default value for the <code class="docutils literal notranslate"><span class="pre">y</span></code> values.  To keep it on the same footing as the previous run we will use the same number of warm up and sample draws.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">funnel_mcmc_gibbs</span> <span class="o">=</span> <span class="n">run_inference</span><span class="p">(</span>
+    <span class="n">MultiHMCGibbs</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">NUTS</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">target_accept_prob</span><span class="o">=</span><span class="mf">0.995</span><span class="p">),</span> <span class="n">NUTS</span><span class="p">(</span><span class="n">model</span><span class="p">)],</span>
+        <span class="p">[[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]]</span>
+    <span class="p">),</span>
+    <span class="s1">&#39;vectorized&#39;</span><span class="p">,</span>
+    <span class="n">gibbs_key</span>
+<span class="p">)</span>
+<span class="n">inf_funnel_gibbs</span> <span class="o">=</span> <span class="n">arviz</span><span class="o">.</span><span class="n">from_numpyro</span><span class="p">(</span><span class="n">funnel_mcmc_gibbs</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;divergences per chain per step:</span><span class="se">\n</span><span class="s1"> </span><span class="si">{</span><span class="n">inf_funnel_gibbs</span><span class="o">.</span><span class="n">sample_stats</span><span class="o">.</span><span class="n">diverging</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">arviz</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="n">inf_funnel_gibbs</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>divergences per chain per step:
+ [[  44    0   14 1192]
+ [   0    0    0    0]]
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mean</th>
+      <th>sd</th>
+      <th>hdi_3%</th>
+      <th>hdi_97%</th>
+      <th>mcse_mean</th>
+      <th>mcse_sd</th>
+      <th>ess_bulk</th>
+      <th>ess_tail</th>
+      <th>r_hat</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>x[0]</th>
+      <td>-0.007</td>
+      <td>5.228</td>
+      <td>-6.449</td>
+      <td>6.068</td>
+      <td>0.085</td>
+      <td>0.091</td>
+      <td>6372.0</td>
+      <td>1006.0</td>
+      <td>1.01</td>
+    </tr>
+    <tr>
+      <th>x[1]</th>
+      <td>0.050</td>
+      <td>5.379</td>
+      <td>-6.195</td>
+      <td>6.524</td>
+      <td>0.077</td>
+      <td>0.074</td>
+      <td>8707.0</td>
+      <td>1184.0</td>
+      <td>1.01</td>
+    </tr>
+    <tr>
+      <th>x[2]</th>
+      <td>-0.135</td>
+      <td>6.341</td>
+      <td>-6.192</td>
+      <td>6.487</td>
+      <td>0.132</td>
+      <td>0.128</td>
+      <td>9453.0</td>
+      <td>1112.0</td>
+      <td>1.01</td>
+    </tr>
+    <tr>
+      <th>x[3]</th>
+      <td>-0.042</td>
+      <td>6.220</td>
+      <td>-5.783</td>
+      <td>7.172</td>
+      <td>0.094</td>
+      <td>0.101</td>
+      <td>9905.0</td>
+      <td>1209.0</td>
+      <td>1.01</td>
+    </tr>
+    <tr>
+      <th>y</th>
+      <td>-0.455</td>
+      <td>2.934</td>
+      <td>-5.943</td>
+      <td>4.847</td>
+      <td>0.267</td>
+      <td>0.189</td>
+      <td>123.0</td>
+      <td>495.0</td>
+      <td>1.02</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>Again chain 4 has a large number of divergences, so let’s remove it from the plots.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x_model_gibbs</span> <span class="o">=</span> <span class="n">inf_funnel_gibbs</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">chain</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">posterior</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+<span class="n">y_model_gibbs</span> <span class="o">=</span> <span class="n">inf_funnel_gibbs</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">chain</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">posterior</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">121</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_model_hmc</span><span class="p">,</span> <span class="n">y_model_hmc</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;HMC&#39;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_model_gibbs</span><span class="p">,</span> <span class="n">y_model_gibbs</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Gibbs&#39;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;x[0]&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">122</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">y_model_hmc</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s1">&#39;step&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;HMC&#39;</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">y_model_gibbs</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s1">&#39;step&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Gibbs&#39;</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_marginal_true</span><span class="p">,</span> <span class="n">y_marginal_true</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;True marginal&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/0a09244c9fbef0b9d238fbf278db990f09afdb15cf8299fc4a484a3e7c504484.png" src="_images/0a09244c9fbef0b9d238fbf278db990f09afdb15cf8299fc4a484a3e7c504484.png" />
+</div>
+</div>
+<p>We can see that with the same set up <code class="docutils literal notranslate"><span class="pre">MultiHMCGibbs</span></code> was able to reach deeper into the funnel and pull out the negative <code class="docutils literal notranslate"><span class="pre">y</span></code> values missed by <code class="docutils literal notranslate"><span class="pre">NUTS</span></code>.</p>
+<p>Note: Even if I did not remove chain 4 from both samples the results would be much the same.  Under this parameterization this model is hard for both samplers to draw from, <code class="docutils literal notranslate"><span class="pre">MultiHMCGibbs</span></code> just does a better job with the same set up.</p>
+</section>
+<section id="other-notes">
+<h2>Other notes<a class="headerlink" href="#other-notes" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>You can use as many <code class="docutils literal notranslate"><span class="pre">inner_kernels</span></code> as you want</p></li>
+<li><p>The order the kernels are stepped in is set by the order of the parameter list (in the example above <code class="docutils literal notranslate"><span class="pre">x</span></code> septs first, followed by <code class="docutils literal notranslate"><span class="pre">y</span></code>)</p></li>
+<li><p>The order matters!  Typically you want to step the parameters closest to the likelihood first and the hyper-parameters second.  But for some models this might not be so clear, so some experimentation could be needed.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="basic_usage.html" class="btn btn-neutral float-left" title="Basic usage and comparison" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="multihmcgibbs.html" class="btn btn-neutral float-right" title="MultiHMCGibbs package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Coleman Krawczyk.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
