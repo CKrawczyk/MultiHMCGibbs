@@ -78,3 +78,25 @@ Build documentation with:
 ```bash
 ./build_docs
 ```
+
+## Citation
+
+If you use this sampler in your publication you can cite the software as:
+
+> Coleman Krawczyk. (2024). CKrawczyk/MultiHMCGibbs: v1.0.0 (v1.0.0). Zenodo. https://doi.org/10.5281/zenodo.12167630
+
+Or with bibtex:
+```bibtex
+@software{coleman_krawczyk_2024_12167630,
+  author       = {Coleman Krawczyk},
+  title        = {CKrawczyk/MultiHMCGibbs: v1.0.0},
+  month        = jun,
+  year         = 2024,
+  publisher    = {Zenodo},
+  version      = {v1.0.0},
+  doi          = {10.5281/zenodo.12167630},
+  url          = {https://doi.org/10.5281/zenodo.12167630}
+}
+```
+
+Full citation information can be found on [https://zenodo.org/records/12167630](https://zenodo.org/records/12167630)
