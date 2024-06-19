@@ -11,7 +11,9 @@ Internally each the sampler will:
 4. Step the kernel forward
 5. Move on to the next kernel
 
-Documentation: https://ckrawczyk.github.io/MultiHMCGibbs/
+Documentation: [https://ckrawczyk.github.io/MultiHMCGibbs/](https://ckrawczyk.github.io/MultiHMCGibbs/)
+
+GitHub: [https://github.com/CKrawczyk/MultiHMCGibbs](https://github.com/CKrawczyk/MultiHMCGibbs)
 
 ## Installation
 
