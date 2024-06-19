@@ -1,0 +1,29 @@
+name: Python coverage
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.10'
+    - uses: actions/cache@v2
+      with:
+        path: ${{ env.pythonLocation }}
+        key: ${{ env.pythonLocation }}-${{ hashFiles('setup.cfg') }}
+    - name: Install local package
+      run: |
+        pip install -U pip
+        pip install -U .[dev]
+    - name: Run tests with coverage
+      run: coverage run
+    - name: Coverage report
+      run: coverage report
