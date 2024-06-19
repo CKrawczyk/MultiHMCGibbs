@@ -51,6 +51,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#example-usage">Example usage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#contributing">Contributing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#citation">Citation</a></li>
 </ul>
 </li>
 </ul>
@@ -88,7 +89,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="an-hmc-within-gibbs-sampler-for-numpyro">
+  <p><a class="reference external" href="https://doi.org/10.5281/zenodo.12167630"><img alt="DOI" src="https://zenodo.org/badge/DOI/10.5281/zenodo.12167630.svg" /></a></p>
+<section id="an-hmc-within-gibbs-sampler-for-numpyro">
 <h1>An HMC-within-Gibbs sampler for Numpyro<a class="headerlink" href="#an-hmc-within-gibbs-sampler-for-numpyro" title="Link to this heading"></a></h1>
 <p>This package adds a new HMC-within-Gibbs sampler to Numpyro.  Unlike the <code class="docutils literal notranslate"><span class="pre">HMCGibbs</span></code> sampler currently available, this sampler is for situations where you do not have an analytic form for one of your conditioned distributions.  Instead, it uses an HMC/NUTS sampler to estimate draws from <em>each</em> of the conditioned distributions.</p>
 <p>To use <code class="docutils literal notranslate"><span class="pre">MultiHMCGibbs</span></code> you need to create a list of HMC or NUTS kernels that wrap the same model, but each can have its own keywords such as <code class="docutils literal notranslate"><span class="pre">target_accept_prob</span></code> or <code class="docutils literal notranslate"><span class="pre">max_tree_depth</span></code>.  The other argument is a list of lists containing the <strong>free</strong> parameters for each of the inner kernels.</p>
@@ -159,6 +161,27 @@ coverage<span class="w"> </span>report
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./build_docs
 </pre></div>
 </div>
+</section>
+<section id="citation">
+<h2>Citation<a class="headerlink" href="#citation" title="Link to this heading"></a></h2>
+<p>If you use this sampler in your publication you can cite the software as:</p>
+<blockquote>
+<div><p>Coleman Krawczyk. (2024). CKrawczyk/MultiHMCGibbs: v1.0.0 (v1.0.0). Zenodo. https://doi.org/10.5281/zenodo.12167630</p>
+</div></blockquote>
+<p>Or with bibtex:</p>
+<div class="highlight-bibtex notranslate"><div class="highlight"><pre><span></span><span class="nc">@software</span><span class="p">{</span><span class="nl">coleman_krawczyk_2024_12167630</span><span class="p">,</span>
+<span class="w">  </span><span class="na">author</span><span class="w">       </span><span class="p">=</span><span class="w"> </span><span class="s">{Coleman Krawczyk}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">title</span><span class="w">        </span><span class="p">=</span><span class="w"> </span><span class="s">{CKrawczyk/MultiHMCGibbs: v1.0.0}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">month</span><span class="w">        </span><span class="p">=</span><span class="w"> </span><span class="nv">jun</span><span class="p">,</span>
+<span class="w">  </span><span class="na">year</span><span class="w">         </span><span class="p">=</span><span class="w"> </span><span class="m">2024</span><span class="p">,</span>
+<span class="w">  </span><span class="na">publisher</span><span class="w">    </span><span class="p">=</span><span class="w"> </span><span class="s">{Zenodo}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">version</span><span class="w">      </span><span class="p">=</span><span class="w"> </span><span class="s">{v1.0.0}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">doi</span><span class="w">          </span><span class="p">=</span><span class="w"> </span><span class="s">{10.5281/zenodo.12167630}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">url</span><span class="w">          </span><span class="p">=</span><span class="w"> </span><span class="s">{https://doi.org/10.5281/zenodo.12167630}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Full citation information can be found on <a class="reference external" href="https://zenodo.org/records/12167630">https://zenodo.org/records/12167630</a></p>
 </section>
 </section>
 
