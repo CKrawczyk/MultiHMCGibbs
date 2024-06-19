@@ -1,3 +1,6 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.12167630.svg)](https://doi.org/10.5281/zenodo.12167630)
+
+
 # An HMC-within-Gibbs sampler for Numpyro
 
 This package adds a new HMC-within-Gibbs sampler to Numpyro.  Unlike the `HMCGibbs` sampler currently available, this sampler is for situations where you do not have an analytic form for one of your conditioned distributions.  Instead, it uses an HMC/NUTS sampler to estimate draws from *each* of the conditioned distributions.
