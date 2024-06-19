@@ -58,7 +58,7 @@ class TestMultiHMCGibbs(unittest.TestCase):
             num_warmup=1000,
             num_samples=1000,
             num_chains=2,
-            progress_bar=False,
+            progress_bar=True,
             chain_method='sequential'
         )
         mcmc.run(rng_key)
@@ -110,6 +110,29 @@ class TestMultiHMCGibbs(unittest.TestCase):
             progress_bar=False,
         )
         mcmc.run(rng_key, init_params={'x': jnp.array(0.0), 'y': jnp.array(0.0)})
+        x = mcmc.get_samples()['x']
+        y = mcmc.get_samples()['y']
+        assert_allclose(np.mean(x), 0.5, atol=0.25, err_msg='mean(x) not close to 0.5')
+        assert_allclose(np.std(x), np.sqrt(2), atol=0.25, err_msg='std(x) not close to sqrt(2)')
+        assert_allclose(np.mean(y), 0.5, atol=0.25, err_msg='mean(y) not close to 0.5')
+        assert_allclose(np.std(y), np.sqrt(2), atol=0.25, err_msg='std(y) not close to sqrt(2)')
+
+    def test_forward(self):
+        inner_kernels = [
+            NUTS(model, forward_mode_differentiation=True),
+            NUTS(model, forward_mode_differentiation=True)
+        ]
+        outer_kernel = MultiHMCGibbs(
+            inner_kernels,
+            [['y'], ['x']]
+        )
+        mcmc = MCMC(
+            outer_kernel,
+            num_warmup=1000,
+            num_samples=1000,
+            progress_bar=False
+        )
+        mcmc.run(rng_key)
         x = mcmc.get_samples()['x']
         y = mcmc.get_samples()['y']
         assert_allclose(np.mean(x), 0.5, atol=0.25, err_msg='mean(x) not close to 0.5')
