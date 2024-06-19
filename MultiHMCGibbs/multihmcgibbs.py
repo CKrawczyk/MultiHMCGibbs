@@ -1,3 +1,6 @@
+# Copyright 2024 Coleman Krawczyk
+# SPDX-License-Identifier: Apache-2.0
+
 import copy
 
 from collections import namedtuple, Counter
