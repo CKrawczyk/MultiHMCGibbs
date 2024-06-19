@@ -1,10 +1,10 @@
 # An HMC-within-Gibbs sampler for Numpyro
 
-This package adds a new HMC-within-Gibbs sampler to Numpyro.  Unlike the `HMCGibbs` sampler currently available, this sampler is for situations where you do not have an analytic form for one of your conditioned distributions.  Instead it uses a HMC/NUTS sampler to estimate draws from *each* of the conditioned distributions.
+This package adds a new HMC-within-Gibbs sampler to Numpyro.  Unlike the `HMCGibbs` sampler currently available, this sampler is for situations where you do not have an analytic form for one of your conditioned distributions.  Instead, it uses an HMC/NUTS sampler to estimate draws from *each* of the conditioned distributions.
 
-To use `MultiHMCGibbs` you need to create a list of HMC or NUTS kernels that wrap the same model, but each can have their own keywords such as `target_accept_prob` or `max_tree_depth`.  The other argument is a list of lists containing the **free** parameters for each of the inner kernels. 
+To use `MultiHMCGibbs` you need to create a list of HMC or NUTS kernels that wrap the same model, but each can have its own keywords such as `target_accept_prob` or `max_tree_depth`.  The other argument is a list of lists containing the **free** parameters for each of the inner kernels. 
 
-Internally each the sampler will:
+Internally the sampler will:
 1. Loop over the kernels in the list
 2. Conditioned it on the non-free parameters
 3. Re-calculate the likelihood and gradients at the new conditioned point
