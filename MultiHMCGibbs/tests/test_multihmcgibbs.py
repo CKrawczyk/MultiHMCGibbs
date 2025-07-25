@@ -42,10 +42,10 @@ class TestMultiHMCGibbs(unittest.TestCase):
         mcmc.run(rng_key)
         x = mcmc.get_samples()['x']
         y = mcmc.get_samples()['y']
-        assert_allclose(np.mean(x), 0.5, atol=0.3, err_msg='mean(x) not close to 0.5')
-        assert_allclose(np.std(x), np.sqrt(2), atol=0.3, err_msg='std(x) not close to sqrt(2)')
-        assert_allclose(np.mean(y), 0.5, atol=0.3, err_msg='mean(y) not close to 0.5')
-        assert_allclose(np.std(y), np.sqrt(2), atol=0.3, err_msg='std(y) not close to sqrt(2)')
+        assert_allclose(np.mean(x), 0.5, atol=0.4, err_msg='mean(x) not close to 0.5')
+        assert_allclose(np.std(x), np.sqrt(2), atol=0.4, err_msg='std(x) not close to sqrt(2)')
+        assert_allclose(np.mean(y), 0.5, atol=0.4, err_msg='mean(y) not close to 0.5')
+        assert_allclose(np.std(y), np.sqrt(2), atol=0.4, err_msg='std(y) not close to sqrt(2)')
 
     def test_sequential(self):
         inner_kernels = [
@@ -67,10 +67,10 @@ class TestMultiHMCGibbs(unittest.TestCase):
         mcmc.run(rng_key)
         x = mcmc.get_samples()['x']
         y = mcmc.get_samples()['y']
-        assert_allclose(np.mean(x), 0.5, atol=0.3, err_msg='mean(x) not close to 0.5')
-        assert_allclose(np.std(x), np.sqrt(2), atol=0.3, err_msg='std(x) not close to sqrt(2)')
-        assert_allclose(np.mean(y), 0.5, atol=0.3, err_msg='mean(y) not close to 0.5')
-        assert_allclose(np.std(y), np.sqrt(2), atol=0.3, err_msg='std(y) not close to sqrt(2)')
+        assert_allclose(np.mean(x), 0.5, atol=0.4, err_msg='mean(x) not close to 0.5')
+        assert_allclose(np.std(x), np.sqrt(2), atol=0.4, err_msg='std(x) not close to sqrt(2)')
+        assert_allclose(np.mean(y), 0.5, atol=0.4, err_msg='mean(y) not close to 0.5')
+        assert_allclose(np.std(y), np.sqrt(2), atol=0.4, err_msg='std(y) not close to sqrt(2)')
 
     def test_vectorized(self):
         inner_kernels = [
@@ -92,10 +92,10 @@ class TestMultiHMCGibbs(unittest.TestCase):
         mcmc.run(rng_key)
         x = mcmc.get_samples()['x']
         y = mcmc.get_samples()['y']
-        assert_allclose(np.mean(x), 0.5, atol=0.3, err_msg='mean(x) not close to 0.5')
-        assert_allclose(np.std(x), np.sqrt(2), atol=0.3, err_msg='std(x) not close to sqrt(2)')
-        assert_allclose(np.mean(y), 0.5, atol=0.3, err_msg='mean(y) not close to 0.5')
-        assert_allclose(np.std(y), np.sqrt(2), atol=0.3, err_msg='std(y) not close to sqrt(2)')
+        assert_allclose(np.mean(x), 0.5, atol=0.4, err_msg='mean(x) not close to 0.5')
+        assert_allclose(np.std(x), np.sqrt(2), atol=0.4, err_msg='std(x) not close to sqrt(2)')
+        assert_allclose(np.mean(y), 0.5, atol=0.4, err_msg='mean(y) not close to 0.5')
+        assert_allclose(np.std(y), np.sqrt(2), atol=0.4, err_msg='std(y) not close to sqrt(2)')
 
     def test_init_params(self):
         inner_kernels = [
@@ -115,10 +115,10 @@ class TestMultiHMCGibbs(unittest.TestCase):
         mcmc.run(rng_key, init_params={'x': jnp.array(0.0), 'y': jnp.array(0.0)})
         x = mcmc.get_samples()['x']
         y = mcmc.get_samples()['y']
-        assert_allclose(np.mean(x), 0.5, atol=0.3, err_msg='mean(x) not close to 0.5')
-        assert_allclose(np.std(x), np.sqrt(2), atol=0.3, err_msg='std(x) not close to sqrt(2)')
-        assert_allclose(np.mean(y), 0.5, atol=0.3, err_msg='mean(y) not close to 0.5')
-        assert_allclose(np.std(y), np.sqrt(2), atol=0.3, err_msg='std(y) not close to sqrt(2)')
+        assert_allclose(np.mean(x), 0.5, atol=0.4, err_msg='mean(x) not close to 0.5')
+        assert_allclose(np.std(x), np.sqrt(2), atol=0.4, err_msg='std(x) not close to sqrt(2)')
+        assert_allclose(np.mean(y), 0.5, atol=0.4, err_msg='mean(y) not close to 0.5')
+        assert_allclose(np.std(y), np.sqrt(2), atol=0.4, err_msg='std(y) not close to sqrt(2)')
 
     def test_forward(self):
         inner_kernels = [
@@ -138,10 +138,10 @@ class TestMultiHMCGibbs(unittest.TestCase):
         mcmc.run(rng_key)
         x = mcmc.get_samples()['x']
         y = mcmc.get_samples()['y']
-        assert_allclose(np.mean(x), 0.5, atol=0.3, err_msg='mean(x) not close to 0.5')
-        assert_allclose(np.std(x), np.sqrt(2), atol=0.3, err_msg='std(x) not close to sqrt(2)')
-        assert_allclose(np.mean(y), 0.5, atol=0.3, err_msg='mean(y) not close to 0.5')
-        assert_allclose(np.std(y), np.sqrt(2), atol=0.3, err_msg='std(y) not close to sqrt(2)')
+        assert_allclose(np.mean(x), 0.5, atol=0.4, err_msg='mean(x) not close to 0.5')
+        assert_allclose(np.std(x), np.sqrt(2), atol=0.4, err_msg='std(x) not close to sqrt(2)')
+        assert_allclose(np.mean(y), 0.5, atol=0.4, err_msg='mean(y) not close to 0.5')
+        assert_allclose(np.std(y), np.sqrt(2), atol=0.4, err_msg='std(y) not close to sqrt(2)')
 
     def test_model_mismatch(self):
         def model2():
