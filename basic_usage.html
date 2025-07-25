@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
@@ -5,20 +7,16 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Basic usage and comparison &mdash; MultiHMCGibbs 1.0.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
-      <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
 
   
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=8d563738"></script>
-        <script src="_static/doctools.js?v=9a2dae69"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -94,26 +92,23 @@
 <p>This example will run through a basic comparison of <code class="docutils literal notranslate"><span class="pre">MultiHMCGibbs</span></code> with <code class="docutils literal notranslate"><span class="pre">NUTS</span></code> and <code class="docutils literal notranslate"><span class="pre">HMCGibbs</span></code> for a simple problem where all three methods should give the same results.  Our target distribution will be a 2D normal with some covariance.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
-<span class="kn">import</span> <span class="nn">numpyro</span>
-<span class="kn">import</span> <span class="nn">numpyro.distributions</span> <span class="k">as</span> <span class="nn">dist</span>
-<span class="kn">import</span> <span class="nn">arviz</span>
-<span class="kn">import</span> <span class="nn">corner</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpyro</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpyro.distributions</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dist</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">arviz</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">corner</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
-<span class="kn">from</span> <span class="nn">numpyro.infer</span> <span class="kn">import</span> <span class="n">MCMC</span><span class="p">,</span> <span class="n">NUTS</span><span class="p">,</span> <span class="n">HMCGibbs</span>
-<span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">random</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpyro.infer</span><span class="w"> </span><span class="kn">import</span> <span class="n">MCMC</span><span class="p">,</span> <span class="n">NUTS</span><span class="p">,</span> <span class="n">HMCGibbs</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jax</span><span class="w"> </span><span class="kn">import</span> <span class="n">random</span>
 
-<span class="kn">from</span> <span class="nn">MultiHMCGibbs</span> <span class="kn">import</span> <span class="n">MultiHMCGibbs</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">MultiHMCGibbs</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiHMCGibbs</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
   from .autonotebook import tqdm as notebook_tqdm
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Matplotlib is building the font cache; this may take a moment.
 </pre></div>
 </div>
 </div>
@@ -123,7 +118,7 @@
 <p>As with any Numpyro sampler we start with a model function for our distribution.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">model</span><span class="p">():</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">model</span><span class="p">():</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">numpyro</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">dist</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">))</span>
     <span class="n">y</span> <span class="o">=</span> <span class="n">numpyro</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">dist</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">))</span>
     <span class="n">numpyro</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="s2">&quot;obs&quot;</span><span class="p">,</span> <span class="n">dist</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span> <span class="n">obs</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">]))</span>
@@ -199,31 +194,31 @@
   <tbody>
     <tr>
       <th>x</th>
-      <td>0.462</td>
-      <td>1.491</td>
-      <td>-2.447</td>
-      <td>3.221</td>
-      <td>0.043</td>
-      <td>0.031</td>
-      <td>1197.0</td>
-      <td>1200.0</td>
+      <td>0.392</td>
+      <td>1.492</td>
+      <td>-2.225</td>
+      <td>3.420</td>
+      <td>0.041</td>
+      <td>0.034</td>
+      <td>1308.0</td>
+      <td>1404.0</td>
       <td>1.0</td>
     </tr>
     <tr>
       <th>y</th>
-      <td>0.420</td>
-      <td>1.498</td>
+      <td>0.500</td>
+      <td>1.499</td>
       <td>-2.312</td>
-      <td>3.307</td>
-      <td>0.044</td>
+      <td>3.202</td>
+      <td>0.042</td>
       <td>0.033</td>
-      <td>1169.0</td>
-      <td>1379.0</td>
+      <td>1281.0</td>
+      <td>1564.0</td>
       <td>1.0</td>
     </tr>
   </tbody>
 </table>
-</div></div><img alt="_images/502bf7114d8f18305a14be364192df9e222fe483aa2eae86c852b9ed053030a5.png" src="_images/502bf7114d8f18305a14be364192df9e222fe483aa2eae86c852b9ed053030a5.png" />
+</div></div><img alt="_images/c20ace36bb78d576a4b4bca5a907c6e25bc48adbf929346dc9d30bfc79e0583d.png" src="_images/c20ace36bb78d576a4b4bca5a907c6e25bc48adbf929346dc9d30bfc79e0583d.png" />
 </div>
 </div>
 </section>
@@ -317,27 +312,27 @@
   <tbody>
     <tr>
       <th>x</th>
-      <td>0.512</td>
-      <td>1.545</td>
-      <td>-2.279</td>
-      <td>3.448</td>
-      <td>0.080</td>
-      <td>0.057</td>
-      <td>376.0</td>
-      <td>669.0</td>
-      <td>1.00</td>
+      <td>0.337</td>
+      <td>1.515</td>
+      <td>-2.704</td>
+      <td>2.994</td>
+      <td>0.085</td>
+      <td>0.045</td>
+      <td>319.0</td>
+      <td>611.0</td>
+      <td>1.02</td>
     </tr>
     <tr>
       <th>y</th>
-      <td>0.355</td>
-      <td>1.552</td>
-      <td>-2.493</td>
-      <td>3.249</td>
-      <td>0.081</td>
-      <td>0.057</td>
-      <td>377.0</td>
-      <td>678.0</td>
-      <td>1.01</td>
+      <td>0.549</td>
+      <td>1.514</td>
+      <td>-2.211</td>
+      <td>3.332</td>
+      <td>0.091</td>
+      <td>0.044</td>
+      <td>277.0</td>
+      <td>689.0</td>
+      <td>1.02</td>
     </tr>
   </tbody>
 </table>
@@ -345,7 +340,7 @@
 MultiHMCGibbs (Orange)
 </pre></div>
 </div>
-<img alt="_images/fb146239123a4b9bead209ee4caaf911decc23f76306ea7fc717a7713af41a57.png" src="_images/fb146239123a4b9bead209ee4caaf911decc23f76306ea7fc717a7713af41a57.png" />
+<img alt="_images/8886ff247f05cc5f5f38993621ce7e04119c1da1b85864e6914a45fe9e1a8329.png" src="_images/8886ff247f05cc5f5f38993621ce7e04119c1da1b85864e6914a45fe9e1a8329.png" />
 </div>
 </div>
 <p>We can see that the two samplers give the same results, a good indication that everything is working.</p>
@@ -363,7 +358,7 @@ MultiHMCGibbs (Orange)
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">gibbs_fn</span><span class="p">(</span><span class="n">rng_key</span><span class="p">,</span> <span class="n">gibbs_sites</span><span class="p">,</span> <span class="n">hmc_sites</span><span class="p">):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">gibbs_fn</span><span class="p">(</span><span class="n">rng_key</span><span class="p">,</span> <span class="n">gibbs_sites</span><span class="p">,</span> <span class="n">hmc_sites</span><span class="p">):</span>
     <span class="n">y</span> <span class="o">=</span> <span class="n">hmc_sites</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span>
     <span class="n">new_x</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="mf">0.8</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">y</span><span class="p">),</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">0.8</span><span class="p">))</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">rng_key</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">new_x</span><span class="p">}</span>
@@ -427,26 +422,26 @@ MultiHMCGibbs (Orange)
   <tbody>
     <tr>
       <th>x</th>
-      <td>0.459</td>
-      <td>1.445</td>
-      <td>-2.298</td>
-      <td>3.091</td>
-      <td>0.067</td>
-      <td>0.047</td>
-      <td>472.0</td>
-      <td>1299.0</td>
+      <td>0.425</td>
+      <td>1.441</td>
+      <td>-2.260</td>
+      <td>3.145</td>
+      <td>0.058</td>
+      <td>0.026</td>
+      <td>623.0</td>
+      <td>1497.0</td>
       <td>1.01</td>
     </tr>
     <tr>
       <th>y</th>
-      <td>0.425</td>
-      <td>1.438</td>
-      <td>-2.218</td>
-      <td>3.136</td>
-      <td>0.075</td>
-      <td>0.053</td>
-      <td>366.0</td>
-      <td>824.0</td>
+      <td>0.478</td>
+      <td>1.454</td>
+      <td>-2.315</td>
+      <td>3.173</td>
+      <td>0.065</td>
+      <td>0.031</td>
+      <td>500.0</td>
+      <td>1083.0</td>
       <td>1.01</td>
     </tr>
   </tbody>
@@ -456,7 +451,7 @@ MultiHMCGibbs (Orange)
 HMCGibbs (Green)
 </pre></div>
 </div>
-<img alt="_images/1ef7962a4663843f64de660d106c8f828786761c5c2151eba3997a2120382efb.png" src="_images/1ef7962a4663843f64de660d106c8f828786761c5c2151eba3997a2120382efb.png" />
+<img alt="_images/0d92ab31a73d579e27a61375f674cfd59f9a3068448b01120340fe3f3029377b.png" src="_images/0d92ab31a73d579e27a61375f674cfd59f9a3068448b01120340fe3f3029377b.png" />
 </div>
 </div>
 <p>As before, we see that this sampler gives the same results.</p>

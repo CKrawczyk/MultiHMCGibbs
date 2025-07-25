@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
@@ -5,20 +7,16 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MultiHMCGibbs package &mdash; MultiHMCGibbs 1.0.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
-      <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
 
   
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=8d563738"></script>
-        <script src="_static/doctools.js?v=9a2dae69"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -70,6 +68,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#MultiHMCGibbs.multihmcgibbs.MultiHMCGibbsState"><code class="docutils literal notranslate"><span class="pre">MultiHMCGibbsState</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#MultiHMCGibbs.multihmcgibbs.MultiHMCGibbsState.diverging"><code class="docutils literal notranslate"><span class="pre">MultiHMCGibbsState.diverging</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#MultiHMCGibbs.multihmcgibbs.MultiHMCGibbsState.hmc_states"><code class="docutils literal notranslate"><span class="pre">MultiHMCGibbsState.hmc_states</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#MultiHMCGibbs.multihmcgibbs.MultiHMCGibbsState.potential_energy"><code class="docutils literal notranslate"><span class="pre">MultiHMCGibbsState.potential_energy</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#MultiHMCGibbs.multihmcgibbs.MultiHMCGibbsState.rng_key"><code class="docutils literal notranslate"><span class="pre">MultiHMCGibbsState.rng_key</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#MultiHMCGibbs.multihmcgibbs.MultiHMCGibbsState.z"><code class="docutils literal notranslate"><span class="pre">MultiHMCGibbsState.z</span></code></a></li>
 </ul>
@@ -122,14 +121,14 @@ sampler.</p>
 <li><p><strong>gibbs_sites_list</strong> (List of lists of sites names that are <em>free parameters</em> for each Gibbs step, all other) – sample sites are fixed to their current values for the step. Each inner list is updated as a group,
 and the groups are updated in order.  All sample sites for the model must be explicitly listed in
 <em>only one</em> of the groups.</p></li>
-<li><p><strong>**Example**</strong> – <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">random</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpyro</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpyro.distributions</span> <span class="k">as</span> <span class="nn">dist</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">numpyro.infer</span> <span class="kn">import</span> <span class="n">MCMC</span><span class="p">,</span> <span class="n">NUTS</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">MultiHMCGibbs</span> <span class="kn">import</span> <span class="n">MultiHMCGibbs</span>
+<li><p><strong>**Example**</strong> – <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">jax</span><span class="w"> </span><span class="kn">import</span> <span class="n">random</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpyro</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpyro.distributions</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dist</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">numpyro.infer</span><span class="w"> </span><span class="kn">import</span> <span class="n">MCMC</span><span class="p">,</span> <span class="n">NUTS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">MultiHMCGibbs</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiHMCGibbs</span>
 <span class="gp">...</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">model</span><span class="p">():</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">model</span><span class="p">():</span>
 <span class="gp">... </span>    <span class="n">x</span> <span class="o">=</span> <span class="n">numpyro</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">dist</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">))</span>
 <span class="gp">... </span>    <span class="n">y</span> <span class="o">=</span> <span class="n">numpyro</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">dist</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">))</span>
 <span class="gp">... </span>    <span class="n">numpyro</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="s2">&quot;obs&quot;</span><span class="p">,</span> <span class="n">dist</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span> <span class="n">obs</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">]))</span>
@@ -243,13 +242,14 @@ class that supports <cite>getattr</cite>.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="MultiHMCGibbs.multihmcgibbs.MultiHMCGibbsState">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">MultiHMCGibbs.multihmcgibbs.</span></span><span class="sig-name descname"><span class="pre">MultiHMCGibbsState</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hmc_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diverging</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng_key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MultiHMCGibbs.multihmcgibbs.MultiHMCGibbsState" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">MultiHMCGibbs.multihmcgibbs.</span></span><span class="sig-name descname"><span class="pre">MultiHMCGibbsState</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hmc_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diverging</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">potential_energy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MultiHMCGibbs.multihmcgibbs.MultiHMCGibbsState" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
 <ul class="simple">
 <li><p><strong>z</strong> - a dict of the current latent values (all sites)</p></li>
 <li><p><strong>hmc_states</strong> - list of current <code class="xref py py-data docutils literal notranslate"><span class="pre">HMCState</span></code> (one per gibbs step)</p></li>
 <li><p><strong>diverging</strong> - A list of boolean value to indicate whether the current trajectory is diverging.</p></li>
 <li><p><strong>rng_key</strong> - random number generator seed used for the iteration.</p></li>
+<li><p><strong>potential_energy</strong> - A list of the potential energy values associated with each posterior sample.</p></li>
 </ul>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="MultiHMCGibbs.multihmcgibbs.MultiHMCGibbsState.diverging">
@@ -261,6 +261,12 @@ class that supports <cite>getattr</cite>.</p>
 <dt class="sig sig-object py" id="MultiHMCGibbs.multihmcgibbs.MultiHMCGibbsState.hmc_states">
 <span class="sig-name descname"><span class="pre">hmc_states</span></span><a class="headerlink" href="#MultiHMCGibbs.multihmcgibbs.MultiHMCGibbsState.hmc_states" title="Link to this definition"></a></dt>
 <dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="MultiHMCGibbs.multihmcgibbs.MultiHMCGibbsState.potential_energy">
+<span class="sig-name descname"><span class="pre">potential_energy</span></span><a class="headerlink" href="#MultiHMCGibbs.multihmcgibbs.MultiHMCGibbsState.potential_energy" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 4</p>
 </dd></dl>
 
 <dl class="py attribute">
