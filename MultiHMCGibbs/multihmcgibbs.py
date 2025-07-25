@@ -93,7 +93,7 @@ class MultiHMCGibbs(MCMCKernel):
 
     @property
     def default_fields(self):
-        return ("z", "diverging","potential_energy")
+        return ("z", "diverging", "potential_energy")
 
     def get_diagnostics_str(self, state):
         # show diagnostics for all inner kernels
@@ -183,9 +183,9 @@ class MultiHMCGibbs(MCMCKernel):
                 hmc_states.append(hmc_state_kdx)
                 rng_keys.append(hmc_state_kdx.rng_key)
                 z = z | hmc_state_kdx.z
-            
+
             potential_energy = 0.0
-            return MultiHMCGibbsState(z, hmc_states, diverging, jnp.stack(rng_keys),potential_energy)
+            return MultiHMCGibbsState(z, hmc_states, diverging, jnp.stack(rng_keys), potential_energy)
 
         # not-vectorized
         if is_prng_key(rng_key):
@@ -243,9 +243,9 @@ class MultiHMCGibbs(MCMCKernel):
             rng_keys.append(hmc_state.rng_key)
             # update new z values (unconstrained space)
             z = z | hmc_state.z
-            
+
         potential_energy = hmc_state.potential_energy  # Add the potential energy after the Gibbs steps are completed
-        return MultiHMCGibbsState(z, hmc_states, jnp.stack(diverging), jnp.stack(rng_keys),potential_energy)
+        return MultiHMCGibbsState(z, hmc_states, jnp.stack(diverging), jnp.stack(rng_keys), potential_energy)
 
     def sample(self, state, model_args, model_kwargs):
         return self._sample_fn(state, model_args, model_kwargs)
