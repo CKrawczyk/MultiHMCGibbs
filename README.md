@@ -52,7 +52,7 @@ outer_kernel = MultiHMCGibbs(
     [['y'], ['x']]
 )
 mcmc = MCMC(
-    kernel,
+    outer_kernel,
     num_warmup=100,
     num_samples=100,
     progress_bar=False
