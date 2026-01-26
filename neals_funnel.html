@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Neal’s funnel &mdash; MultiHMCGibbs 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
 
   
@@ -106,7 +106,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.10.19/x64/lib/python3.10/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
   from .autonotebook import tqdm as notebook_tqdm
 </pre></div>
 </div>
@@ -285,7 +285,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/1c5d3174ecf0e43ec600639362960794115d029106e5c26f45877adabdd1cb67.png" src="_images/1c5d3174ecf0e43ec600639362960794115d029106e5c26f45877adabdd1cb67.png" />
+<img alt="_images/22ae90bfb7a2a5a98930690d89969db84382f58e93a27c209ec6255c3c762e17.png" src="_images/22ae90bfb7a2a5a98930690d89969db84382f58e93a27c209ec6255c3c762e17.png" />
 </div>
 </div>
 <p>We can see that <code class="docutils literal notranslate"><span class="pre">NUTS</span></code> is struggling with this model, the <code class="docutils literal notranslate"><span class="pre">y</span></code> marginal is still missing a bit of negative values at the bottom of the funnel.</p>
@@ -433,7 +433,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/d78a2afa4ce212715c594015ce2697d0e15ec03075a213b4aabf045bed76ad7a.png" src="_images/d78a2afa4ce212715c594015ce2697d0e15ec03075a213b4aabf045bed76ad7a.png" />
+<img alt="_images/f69f2cf1eb191b8f00445cebf67ac4b7fd7997b3bb4b0dad2d01029588dddb43.png" src="_images/f69f2cf1eb191b8f00445cebf67ac4b7fd7997b3bb4b0dad2d01029588dddb43.png" />
 </div>
 </div>
 <p>We can see that with the same set up <code class="docutils literal notranslate"><span class="pre">MultiHMCGibbs</span></code> was able to reach deeper into the funnel and pull out the negative <code class="docutils literal notranslate"><span class="pre">y</span></code> values missed by <code class="docutils literal notranslate"><span class="pre">NUTS</span></code>.</p>
